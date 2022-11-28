@@ -2,9 +2,13 @@ package com.example.ws_session1.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -25,6 +29,7 @@ public class ImageViewerActivity extends AppCompatActivity implements View.OnCli
         setOnClick();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setOnClick() {
         findViewById(R.id.viewer_close).setOnClickListener(this);
         findViewById(R.id.viewer_remove).setOnClickListener(this);
@@ -33,7 +38,21 @@ public class ImageViewerActivity extends AppCompatActivity implements View.OnCli
         file = new File(filePath);
         try {
             Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(file));
-            ((ImageView) findViewById(R.id.viewer_image)).setImageBitmap(bitmap);
+            ImageView iv = ((ImageView) findViewById(R.id.viewer_image));
+            iv.setImageBitmap(bitmap);
+            iv.setOnTouchListener(new OnSwipeTouchListener(getApplication()) {
+                @Override
+                public void onSwipeRight() {
+                    finish();
+                }
+
+                @Override
+                public void onSwipeLeft() {
+                    file.delete();
+                    finish();
+                }
+            });
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -55,3 +74,4 @@ public class ImageViewerActivity extends AppCompatActivity implements View.OnCli
         }
     }
 }
+
